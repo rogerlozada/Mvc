@@ -35,17 +35,17 @@
     <MicrosoftAspNetCoreHostingAbstractionsPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreHostingAbstractionsPackageVersion>
     <MicrosoftAspNetCoreHostingPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreHostingPackageVersion>
     <MicrosoftAspNetCoreHtmlAbstractionsPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreHtmlAbstractionsPackageVersion>
-    <MicrosoftAspNetCoreHttpExtensionsPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreHttpExtensionsPackageVersion>
+    <MicrosoftAspNetCoreHttpExtensionsPackageVersion>2.2.0-a-preview1-utf-8-16710</MicrosoftAspNetCoreHttpExtensionsPackageVersion>
     <MicrosoftAspNetCoreHttpPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreHttpPackageVersion>
     <MicrosoftAspNetCoreJsonPatchPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreJsonPatchPackageVersion>
     <MicrosoftAspNetCoreLocalizationPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreLocalizationPackageVersion>
     <MicrosoftAspNetCoreLocalizationRoutingPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreLocalizationRoutingPackageVersion>
-    <MicrosoftAspNetCoreMvcRazorExtensionsPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreMvcRazorExtensionsPackageVersion>
+    <MicrosoftAspNetCoreMvcRazorExtensionsPackageVersion>2.2.0-a-preview1-utf-8-31674</MicrosoftAspNetCoreMvcRazorExtensionsPackageVersion>
     <MicrosoftAspNetCoreRangeHelperSourcesPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreRangeHelperSourcesPackageVersion>
-    <MicrosoftAspNetCoreRazorDesignPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreRazorDesignPackageVersion>
-    <MicrosoftAspNetCoreRazorLanguagePackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreRazorLanguagePackageVersion>
-    <MicrosoftAspNetCoreRazorRuntimePackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreRazorRuntimePackageVersion>
-    <MicrosoftAspNetCoreRazorTagHelpersTestingSourcesPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreRazorTagHelpersTestingSourcesPackageVersion>
+    <MicrosoftAspNetCoreRazorDesignPackageVersion>2.2.0-a-preview1-utf-8-31674</MicrosoftAspNetCoreRazorDesignPackageVersion>
+    <MicrosoftAspNetCoreRazorLanguagePackageVersion>2.2.0-a-preview1-utf-8-31674</MicrosoftAspNetCoreRazorLanguagePackageVersion>
+    <MicrosoftAspNetCoreRazorRuntimePackageVersion>2.2.0-a-preview1-utf-8-31674</MicrosoftAspNetCoreRazorRuntimePackageVersion>
+    <MicrosoftAspNetCoreRazorTagHelpersTestingSourcesPackageVersion>2.2.0-a-preview1-utf-8-31674</MicrosoftAspNetCoreRazorTagHelpersTestingSourcesPackageVersion>
     <MicrosoftAspNetCoreResponseCachingAbstractionsPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreResponseCachingAbstractionsPackageVersion>
     <MicrosoftAspNetCoreResponseCachingPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreResponseCachingPackageVersion>
     <MicrosoftAspNetCoreRoutingAbstractionsPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreRoutingAbstractionsPackageVersion>
@@ -56,7 +56,7 @@
     <MicrosoftAspNetCoreStaticFilesPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreStaticFilesPackageVersion>
     <MicrosoftAspNetCoreTestHostPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreTestHostPackageVersion>
     <MicrosoftAspNetCoreTestingPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreTestingPackageVersion>
-    <MicrosoftAspNetCoreWebUtilitiesPackageVersion>2.2.0-preview1-34967</MicrosoftAspNetCoreWebUtilitiesPackageVersion>
+    <MicrosoftAspNetCoreWebUtilitiesPackageVersion>2.2.0-a-preview1-utf-8-16710</MicrosoftAspNetCoreWebUtilitiesPackageVersion>
     <MicrosoftAspNetWebApiClientPackageVersion>5.2.6</MicrosoftAspNetWebApiClientPackageVersion>
     <MicrosoftCodeAnalysisCSharpPackageVersion>2.8.0</MicrosoftCodeAnalysisCSharpPackageVersion>
     <MicrosoftCodeAnalysisCSharpWorkspacesPackageVersion>2.8.0</MicrosoftCodeAnalysisCSharpWorkspacesPackageVersion>
