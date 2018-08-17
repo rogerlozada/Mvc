@@ -56,5 +56,7 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures
         /// <see cref="IHtmlHelper.ValidationSummary"/> and other overloads.
         /// </summary>
         public string ValidationSummaryMessageElement { get; set; } = "span";
+
+        public bool HighlightBrokenLinks { get; set; }
     }
 }

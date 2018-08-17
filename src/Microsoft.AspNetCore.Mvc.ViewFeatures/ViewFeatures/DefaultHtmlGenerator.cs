@@ -40,6 +40,7 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures
         private readonly IUrlHelperFactory _urlHelperFactory;
         private readonly HtmlEncoder _htmlEncoder;
         private readonly ValidationHtmlAttributeProvider _validationAttributeProvider;
+        private readonly bool _highlightBrokenLinks;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultHtmlGenerator"/> class.
@@ -89,11 +90,14 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures
                 throw new ArgumentNullException(nameof(validationAttributeProvider));
             }
 
+            
             _antiforgery = antiforgery;
             _metadataProvider = metadataProvider;
             _urlHelperFactory = urlHelperFactory;
             _htmlEncoder = htmlEncoder;
             _validationAttributeProvider = validationAttributeProvider;
+
+            _highlightBrokenLinks = optionsAccessor.Value.HtmlHelperOptions.HighlightBrokenLinks;
 
             // Underscores are fine characters in id's.
             IdAttributeDotReplacement = optionsAccessor.Value.HtmlHelperOptions.IdAttributeDotReplacement;
@@ -153,8 +157,24 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures
             }
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(viewContext);
-            var url = urlHelper.Action(actionName, controllerName, routeValues, protocol, hostname, fragment);
-            return GenerateLink(linkText, url, htmlAttributes);
+            var urlActionContext = new UrlActionContext
+            {
+                Action = actionName,
+                Controller = controllerName,
+                Host = hostname,
+                Values = routeValues,
+                Protocol = protocol,
+                Fragment = fragment
+            };
+
+
+            if (_highlightBrokenLinks && urlHelper is UrlHelperBase urlHelperBase)
+            {
+                var highlight = !urlHelperBase.TryGenerateAction(urlActionContext, out var url);
+                return GenerateLink(linkText, url, htmlAttributes, highlight);
+            }
+
+            return GenerateLink(linkText, urlHelper.Action(urlActionContext), htmlAttributes);
         }
 
         /// <inheritdoc />
@@ -1369,6 +1389,31 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures
 
             tagBuilder.MergeAttributes(GetHtmlAttributeDictionaryOrNull(htmlAttributes));
             tagBuilder.MergeAttribute("href", url);
+
+            return tagBuilder;
+        }
+
+        protected TagBuilder GenerateLink(
+            string linkText,
+            string url,
+            object htmlAttributes,
+            bool highlightBrokenLinks)
+        {
+            if (linkText == null)
+            {
+                throw new ArgumentNullException(nameof(linkText));
+            }
+
+            var tagBuilder = new TagBuilder("a");
+            tagBuilder.InnerHtml.SetContent(linkText);
+
+            tagBuilder.MergeAttributes(GetHtmlAttributeDictionaryOrNull(htmlAttributes));
+            tagBuilder.MergeAttribute("href", url);
+
+            if (highlightBrokenLinks)
+            {
+                tagBuilder.AddCssClass("mvc-broken-link");
+            }
 
             return tagBuilder;
         }

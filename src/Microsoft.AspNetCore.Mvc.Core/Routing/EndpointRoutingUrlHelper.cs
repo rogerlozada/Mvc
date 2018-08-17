@@ -43,17 +43,16 @@ namespace Microsoft.AspNetCore.Mvc.Routing
             _logger = logger;
         }
 
-        /// <inheritdoc />
-        public override string Action(UrlActionContext urlActionContext)
+        public override bool TryGenerateAction(UrlActionContext actionContext, out string url)
         {
-            if (urlActionContext == null)
+            if (actionContext == null)
             {
-                throw new ArgumentNullException(nameof(urlActionContext));
+                throw new ArgumentNullException(nameof(actionContext));
             }
 
-            var valuesDictionary = GetValuesDictionary(urlActionContext.Values);
+            var valuesDictionary = GetValuesDictionary(actionContext.Values);
 
-            if (urlActionContext.Action == null)
+            if (actionContext.Action == null)
             {
                 if (!valuesDictionary.ContainsKey("action") &&
                     AmbientValues.TryGetValue("action", out var action))
@@ -63,10 +62,10 @@ namespace Microsoft.AspNetCore.Mvc.Routing
             }
             else
             {
-                valuesDictionary["action"] = urlActionContext.Action;
+                valuesDictionary["action"] = actionContext.Action;
             }
 
-            if (urlActionContext.Controller == null)
+            if (actionContext.Controller == null)
             {
                 if (!valuesDictionary.ContainsKey("controller") &&
                     AmbientValues.TryGetValue("controller", out var controller))
@@ -76,25 +75,40 @@ namespace Microsoft.AspNetCore.Mvc.Routing
             }
             else
             {
-                valuesDictionary["controller"] = urlActionContext.Controller;
+                valuesDictionary["controller"] = actionContext.Controller;
             }
+
 
             var successfullyGeneratedLink = _linkGenerator.TryGetLink(
                 ActionContext.HttpContext,
                 valuesDictionary,
                 out var link);
+
             if (!successfullyGeneratedLink)
             {
-                //TODO: log here
-
-                return null;
+                url = null;
+                return false;
             }
 
-            return GenerateUrl(urlActionContext.Protocol, urlActionContext.Host, link, urlActionContext.Fragment);
+            url = GenerateUrl(actionContext.Protocol, actionContext.Host, link, actionContext.Fragment);
+            return true;
+        }
+
+        /// <inheritdoc />
+        public override string Action(UrlActionContext urlActionContext)
+        {
+            TryGenerateAction(urlActionContext, out var url);
+            return url;
         }
 
         /// <inheritdoc />
         public override string RouteUrl(UrlRouteContext routeContext)
+        {
+            TryGenerateRouteUrl(routeContext, out var url);
+            return url;
+        }
+
+        public override bool TryGenerateRouteUrl(UrlRouteContext routeContext, out string url)
         {
             if (routeContext == null)
             {
@@ -111,10 +125,12 @@ namespace Microsoft.AspNetCore.Mvc.Routing
 
             if (!successfullyGeneratedLink)
             {
-                return null;
+                url = null;
+                return false;
             }
 
-            return GenerateUrl(routeContext.Protocol, routeContext.Host, link, routeContext.Fragment);
+            url = GenerateUrl(routeContext.Protocol, routeContext.Host, link, routeContext.Fragment);
+            return true;
         }
     }
 }

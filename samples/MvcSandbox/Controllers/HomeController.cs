@@ -14,5 +14,10 @@ namespace MvcSandbox.Controllers
         {
             return View();
         }
+
+        public IActionResult Test1()
+        {
+            return View();
+        }
     }
 }
