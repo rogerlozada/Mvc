@@ -24,6 +24,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
     public class CollectionModelBinder<TElement> : ICollectionModelBinder
     {
         private static readonly IValueProvider EmptyValueProvider = new CompositeValueProvider();
+        private readonly bool _allowValidatingTopLevelNodes;
         private Func<object> _modelCreator;
 
         /// <summary>
@@ -44,7 +45,30 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
         /// </summary>
         /// <param name="elementBinder">The <see cref="IModelBinder"/> for binding elements.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <summary>
+        /// <remarks>
+        /// The binder will not add an error for an unbound top-level model even if
+        /// <see cref="ModelMetadata.IsBindingRequired"/> is <see langword="true"/>.
+        /// </remarks>
         public CollectionModelBinder(IModelBinder elementBinder, ILoggerFactory loggerFactory)
+            : this(elementBinder, loggerFactory, allowValidatingTopLevelNodes: false)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="CollectionModelBinder{TElement}"/>.
+        /// </summary>
+        /// <param name="elementBinder">The <see cref="IModelBinder"/> for binding elements.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="allowValidatingTopLevelNodes">
+        /// Indication that validation of top-level models is enabled. If <see langword="true"/> and
+        /// <see cref="ModelMetadata.IsBindingRequired"/> is <see langword="true"/> for a top-level model, the binder
+        /// adds a <see cref="ModelStateDictionary"/> error when the model is not bound.
+        /// </param>
+        public CollectionModelBinder(
+            IModelBinder elementBinder,
+            ILoggerFactory loggerFactory,
+            bool allowValidatingTopLevelNodes)
         {
             if (elementBinder == null)
             {
@@ -58,6 +82,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
 
             ElementBinder = elementBinder;
             Logger = loggerFactory.CreateLogger(GetType());
+            _allowValidatingTopLevelNodes = allowValidatingTopLevelNodes;
         }
 
         /// <summary>
@@ -65,7 +90,6 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
         /// </summary>
         protected IModelBinder ElementBinder { get; }
 
-        /// <summary>
         /// The <see cref="ILogger"/> used for logging in this binder.
         /// </summary>
         protected ILogger Logger { get; }
@@ -92,6 +116,11 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
                     if (model == null)
                     {
                         model = CreateEmptyCollection(bindingContext.ModelType);
+                    }
+
+                    if (_allowValidatingTopLevelNodes)
+                    {
+                        AddErrorIfBindingRequired(bindingContext);
                     }
 
                     bindingContext.Result = ModelBindingResult.Success(model);
@@ -162,10 +191,38 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
         }
 
         /// <summary>
+        /// Add a <see cref="ModelError" /> to <see cref="ModelBindingContext.ModelState" /> if
+        /// <see cref="ModelMetadata.IsBindingRequired" />.
+        /// </summary>
+        /// <param name="bindingContext">The <see cref="ModelBindingContext"/>.</param>
+        /// <remarks>
+        /// <para>
+        /// This method should be called only when <see cref="MvcOptions.AllowValidatingTopLevelNodes" /> is
+        /// <see langword="true" /> and a top-level model was not bound.
+        /// </para>
+        /// <para>
+        /// For back-compatibility reasons, <see cref="ModelBindingContext.Result" /> must have
+        /// <see cref="ModelBindingResult.IsModelSet" /> equal to <see langword="true" /> when a
+        /// top-level model is not bound. Therefore, ParameterBinder can not detect a
+        /// <see cref="ModelMetadata.IsBindingRequired" /> failure for collections. Add the error here.
+        /// </para>
+        /// </remarks>
+        protected void AddErrorIfBindingRequired(ModelBindingContext bindingContext)
+        {
+            var modelMetadata = bindingContext.ModelMetadata;
+            if (modelMetadata.IsBindingRequired)
+            {
+                var messageProvider = modelMetadata.ModelBindingMessageProvider;
+                var message = messageProvider.MissingBindRequiredValueAccessor(bindingContext.FieldName);
+                bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, message);
+            }
+        }
+
+        /// <summary>
         /// Create an <see cref="object"/> assignable to <paramref name="targetType"/>.
         /// </summary>
-        /// <param name="targetType"><see cref="Type"/> of the model.</param>
         /// <returns>An <see cref="object"/> assignable to <paramref name="targetType"/>.</returns>
+        /// <param name="targetType"><see cref="Type"/> of the model.</param>
         /// <remarks>Called when creating a default 'empty' model for a top level bind.</remarks>
         protected virtual object CreateEmptyCollection(Type targetType)
         {

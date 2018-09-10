@@ -34,7 +34,13 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
 
                 var binderType = typeof(DictionaryModelBinder<,>).MakeGenericType(dictionaryType.GenericTypeArguments);
                 var loggerFactory = context.Services.GetRequiredService<ILoggerFactory>();
-                return (IModelBinder)Activator.CreateInstance(binderType, keyBinder, valueBinder, loggerFactory);
+                var mvcOptions = context.Services.GetRequiredService<MvcOptions>();
+                return (IModelBinder)Activator.CreateInstance(
+                    binderType,
+                    keyBinder,
+                    valueBinder,
+                    loggerFactory,
+                    mvcOptions.AllowValidatingTopLevelNodes);
             }
 
             return null;

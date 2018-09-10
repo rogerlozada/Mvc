@@ -36,7 +36,8 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
                 BindingSource = Metadata.BindingSource,
                 PropertyFilterProvider = Metadata.PropertyFilterProvider,
             };
-            Services = GetServices();
+
+            (MvcOptions, Services) = GetOptionsAndServices();
         }
 
         public override BindingInfo BindingInfo => _bindingInfo;
@@ -46,6 +47,8 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         public override IModelMetadataProvider MetadataProvider { get; }
 
         public override IServiceProvider Services { get; }
+
+        public MvcOptions MvcOptions { get; }
 
         public override IModelBinder CreateBinder(ModelMetadata metadata)
         {
@@ -77,12 +80,15 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
             _binderCreators.Add((m) => m.Equals(metadata) ? binderCreator() : null);
         }
 
-        private static IServiceProvider GetServices()
+        private static (MvcOptions, IServiceProvider) GetOptionsAndServices()
         {
             var services = new ServiceCollection();
             services.AddSingleton<ILoggerFactory, NullLoggerFactory>();
-            services.AddSingleton(Options.Create(new MvcOptions()));
-            return services.BuildServiceProvider();
+
+            var options = new MvcOptions();
+            services.AddSingleton(Options.Create(options));
+
+            return (options, services.BuildServiceProvider());
         }
     }
 }

@@ -27,7 +27,12 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
 
                 var binderType = typeof(ArrayModelBinder<>).MakeGenericType(elementType);
                 var loggerFactory = context.Services.GetRequiredService<ILoggerFactory>();
-                return (IModelBinder)Activator.CreateInstance(binderType, elementBinder, loggerFactory);
+                var mvcOptions = context.Services.GetRequiredService<MvcOptions>();
+                return (IModelBinder)Activator.CreateInstance(
+                    binderType,
+                    elementBinder,
+                    loggerFactory,
+                    mvcOptions.AllowValidatingTopLevelNodes);
             }
 
             return null;

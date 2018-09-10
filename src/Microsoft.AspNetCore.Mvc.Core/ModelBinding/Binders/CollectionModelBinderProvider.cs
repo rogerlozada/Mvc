@@ -32,7 +32,8 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
             }
 
             var loggerFactory = context.Services.GetRequiredService<ILoggerFactory>();
-            
+            var mvcOptions = context.Services.GetRequiredService<MvcOptions>();
+
             // If the model type is ICollection<> then we can call its Add method, so we can always support it.
             var collectionType = ClosedGenericMatcher.ExtractGenericInterface(modelType, typeof(ICollection<>));
             if (collectionType != null)
@@ -41,7 +42,11 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
                 var elementBinder = context.CreateBinder(context.MetadataProvider.GetMetadataForType(elementType));
 
                 var binderType = typeof(CollectionModelBinder<>).MakeGenericType(collectionType.GenericTypeArguments);
-                return (IModelBinder)Activator.CreateInstance(binderType, elementBinder, loggerFactory);
+                return (IModelBinder)Activator.CreateInstance(
+                    binderType,
+                    elementBinder,
+                    loggerFactory,
+                    mvcOptions.AllowValidatingTopLevelNodes);
             }
 
             // If the model type is IEnumerable<> then we need to know if we can assign a List<> to it, since
@@ -57,7 +62,11 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
                     var elementBinder = context.CreateBinder(context.MetadataProvider.GetMetadataForType(elementType));
 
                     var binderType = typeof(CollectionModelBinder<>).MakeGenericType(enumerableType.GenericTypeArguments);
-                    return (IModelBinder)Activator.CreateInstance(binderType, elementBinder, loggerFactory);
+                    return (IModelBinder)Activator.CreateInstance(
+                        binderType,
+                        elementBinder,
+                        loggerFactory,
+                        mvcOptions.AllowValidatingTopLevelNodes);
                 }
             }
 

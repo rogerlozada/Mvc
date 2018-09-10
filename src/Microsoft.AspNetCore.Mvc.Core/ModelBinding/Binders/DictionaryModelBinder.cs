@@ -21,6 +21,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
     /// <typeparam name="TValue">Type of values in the dictionary.</typeparam>
     public class DictionaryModelBinder<TKey, TValue> : CollectionModelBinder<KeyValuePair<TKey, TValue>>
     {
+        private readonly bool _allowValidatingTopLevelNodes;
         private readonly IModelBinder _valueBinder;
 
         /// <summary>
@@ -43,6 +44,10 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
         /// <param name="keyBinder">The <see cref="IModelBinder"/> for <typeparamref name="TKey"/>.</param>
         /// <param name="valueBinder">The <see cref="IModelBinder"/> for <typeparamref name="TValue"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <remarks>
+        /// The binder will not add an error for an unbound top-level model even if
+        /// <see cref="ModelMetadata.IsBindingRequired"/> is <see langword="true"/>.
+        /// </remarks>
         public DictionaryModelBinder(IModelBinder keyBinder, IModelBinder valueBinder, ILoggerFactory loggerFactory)
             : base(new KeyValuePairModelBinder<TKey, TValue>(keyBinder, valueBinder, loggerFactory), loggerFactory)
         {
@@ -52,6 +57,36 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
             }
 
             _valueBinder = valueBinder;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="DictionaryModelBinder{TKey, TValue}"/>.
+        /// </summary>
+        /// <param name="keyBinder">The <see cref="IModelBinder"/> for <typeparamref name="TKey"/>.</param>
+        /// <param name="valueBinder">The <see cref="IModelBinder"/> for <typeparamref name="TValue"/>.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="allowValidatingTopLevelNodes">
+        /// Indication that validation of top-level models is enabled. If <see langword="true"/> and
+        /// <see cref="ModelMetadata.IsBindingRequired"/> is <see langword="true"/> for a top-level model, the binder
+        /// adds a <see cref="ModelStateDictionary"/> error when the model is not bound.
+        /// </param>
+        public DictionaryModelBinder(
+            IModelBinder keyBinder,
+            IModelBinder valueBinder,
+            ILoggerFactory loggerFactory,
+            bool allowValidatingTopLevelNodes)
+            : base(
+                new KeyValuePairModelBinder<TKey, TValue>(keyBinder, valueBinder, loggerFactory),
+                loggerFactory,
+                allowValidatingTopLevelNodes: false)
+        {
+            if (valueBinder == null)
+            {
+                throw new ArgumentNullException(nameof(valueBinder));
+            }
+
+            _valueBinder = valueBinder;
+            _allowValidatingTopLevelNodes = allowValidatingTopLevelNodes;
         }
 
         /// <inheritdoc />
@@ -85,6 +120,11 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
             {
                 // No IEnumerableValueProvider available for the fallback approach. For example the user may have
                 // replaced the ValueProvider with something other than a CompositeValueProvider.
+                if (_allowValidatingTopLevelNodes && bindingContext.IsTopLevelObject)
+                {
+                    AddErrorIfBindingRequired(bindingContext);
+                }
+
                 return;
             }
 
@@ -94,6 +134,11 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Binders
             if (keys.Count == 0)
             {
                 // No entries with the expected keys.
+                if (_allowValidatingTopLevelNodes && bindingContext.IsTopLevelObject)
+                {
+                    AddErrorIfBindingRequired(bindingContext);
+                }
+
                 return;
             }
 
