@@ -164,7 +164,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                                 endpointInfo.DataTokens,
                                 endpointInfo.ParameterPolicies,
                                 suppressLinkGeneration: false,
-                                suppressPathMatching: false);
+                                suppressPathMatching: false,
+                                endpointInfo.OnApply);
                         }
                     }
                     else
@@ -183,7 +184,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                             dataTokens: null,
                             allParameterPolicies: null,
                             action.AttributeRouteInfo.SuppressLinkGeneration,
-                            action.AttributeRouteInfo.SuppressPathMatching);
+                            action.AttributeRouteInfo.SuppressPathMatching,
+                            null);
                     }
                 }
 
@@ -219,7 +221,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             RouteValueDictionary dataTokens,
             IDictionary<string, IList<IParameterPolicy>> allParameterPolicies,
             bool suppressLinkGeneration,
-            bool suppressPathMatching)
+            bool suppressPathMatching,
+            List<Action<EndpointBuilder>> onApply)
         {
             var newPathSegments = routePattern.PathSegments.ToList();
 
@@ -245,7 +248,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                         routeOrder++,
                         dataTokens,
                         suppressLinkGeneration,
-                        suppressPathMatching);
+                        suppressPathMatching,
+                        onApply);
                     endpoints.Add(subEndpoint);
                 }
 
@@ -305,7 +309,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 routeOrder++,
                 dataTokens,
                 suppressLinkGeneration,
-                suppressPathMatching);
+                suppressPathMatching,
+                onApply);
             endpoints.Add(endpoint);
 
             return routeOrder;
@@ -439,7 +444,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             int order,
             RouteValueDictionary dataTokens,
             bool suppressLinkGeneration,
-            bool suppressPathMatching)
+            bool suppressPathMatching,
+            List<Action<EndpointBuilder>> onApply)
         {
             RequestDelegate requestDelegate = (context) =>
             {
@@ -454,7 +460,10 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             var defaults = new RouteValueDictionary(nonInlineDefaults);
             EnsureRequiredValuesInDefaults(action.RouteValues, defaults);
 
-            var metadataCollection = BuildEndpointMetadata(
+            var builder = new RouteEndpointBuilder(requestDelegate, RoutePatternFactory.Pattern(patternRawText, defaults, parameterPolicies: null, segments), order);
+
+            AddEndpointMetadata(
+                builder.Metadata,
                 action,
                 routeName,
                 new RouteValueDictionary(action.RouteValues),
@@ -462,17 +471,21 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 suppressLinkGeneration,
                 suppressPathMatching);
 
-            var endpoint = new RouteEndpoint(
-                requestDelegate,
-                RoutePatternFactory.Pattern(patternRawText, defaults, parameterPolicies: null, segments),
-                order,
-                metadataCollection,
-                action.DisplayName);
+            builder.DisplayName = action.DisplayName;
 
-            return endpoint;
+            if (onApply != null)
+            {
+                foreach (var apply in onApply)
+                {
+                    apply(builder);
+                }
+            }
+
+            return (RouteEndpoint)builder.Build();
         }
 
-        private static EndpointMetadataCollection BuildEndpointMetadata(
+        private static void AddEndpointMetadata(
+            IList<object> metadata,
             ActionDescriptor action,
             string routeName,
             RouteValueDictionary requiredValues,
@@ -480,14 +493,14 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             bool suppressLinkGeneration,
             bool suppressPathMatching)
         {
-            var metadata = new List<object>
-            {
-                action
-            };
+            metadata.Add(action);
 
             if (action.EndpointMetadata != null)
             {
-                metadata.AddRange(action.EndpointMetadata);
+                foreach (var d in action.EndpointMetadata)
+                {
+                    metadata.Add(d);
+                }
             }
 
             if (dataTokens != null)
@@ -500,8 +513,10 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             // Add filter descriptors to endpoint metadata
             if (action.FilterDescriptors != null && action.FilterDescriptors.Count > 0)
             {
-                metadata.AddRange(action.FilterDescriptors.OrderBy(f => f, FilterDescriptorOrderComparer.Comparer)
-                    .Select(f => f.Filter));
+                foreach (var filter in action.FilterDescriptors.OrderBy(f => f, FilterDescriptorOrderComparer.Comparer).Select(f => f.Filter))
+                {
+                    metadata.Add(filter);
+                }
             }
 
             if (action.ActionConstraints != null && action.ActionConstraints.Count > 0)
@@ -540,9 +555,6 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             {
                 metadata.Add(new SuppressMatchingMetadata());
             }
-
-            var metadataCollection = new EndpointMetadataCollection(metadata);
-            return metadataCollection;
         }
 
         // Ensure required values are a subset of defaults

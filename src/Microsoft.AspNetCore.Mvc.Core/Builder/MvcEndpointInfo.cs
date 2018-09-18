@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Routing.Patterns;
 
 namespace Microsoft.AspNetCore.Builder
 {
-    internal class MvcEndpointInfo
+    internal class MvcEndpointInfo : IApplyEndpointBuilder
     {
         public MvcEndpointInfo(
             string name,
@@ -19,6 +19,8 @@ namespace Microsoft.AspNetCore.Builder
             RouteValueDictionary dataTokens,
             ParameterPolicyFactory parameterPolicyFactory)
         {
+            OnApply = new List<Action<EndpointBuilder>>();
+
             Name = name;
             Pattern = pattern ?? string.Empty;
             DataTokens = dataTokens;
@@ -43,6 +45,7 @@ namespace Microsoft.AspNetCore.Builder
 
         public string Name { get; }
         public string Pattern { get; }
+        public List<Action<EndpointBuilder>> OnApply { get; }
 
         // Non-inline defaults
         public RouteValueDictionary Defaults { get; }
@@ -74,6 +77,11 @@ namespace Microsoft.AspNetCore.Builder
             }
 
             return policies;
+        }
+
+        public void Apply(Action<EndpointBuilder> apply)
+        {
+            OnApply.Add(apply);
         }
     }
 }
