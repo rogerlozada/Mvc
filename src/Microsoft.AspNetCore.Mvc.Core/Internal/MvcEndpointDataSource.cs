@@ -10,6 +10,7 @@ using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
@@ -134,6 +135,16 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                         // - Home/Login
                         foreach (var endpointInfo in ConventionalEndpointInfos)
                         {
+                            if (endpointInfo.ControllerType != null &&
+                                endpointInfo.ControllerType != typeof(ControllerBase))
+                            {
+                                if (!ValidateControllerConstraint(action, endpointInfo))
+                                {
+                                    // Action descriptor does not belong to a controller of the specified type
+                                    continue;
+                                }
+                            }
+
                             // An 'endpointInfo' is applicable if:
                             // 1. it has a parameter (or default value) for 'required' non-null route value
                             // 2. it does not have a parameter (or default value) for 'required' null route value
@@ -165,7 +176,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                                 endpointInfo.ParameterPolicies,
                                 suppressLinkGeneration: false,
                                 suppressPathMatching: false,
-                                endpointInfo.OnApply);
+                                endpointInfo.Conventions);
                         }
                     }
                     else
@@ -207,6 +218,16 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             }
         }
 
+        private static bool ValidateControllerConstraint(ActionDescriptor action, MvcEndpointInfo endpointInfo)
+        {
+            if (action is ControllerActionDescriptor controllerActionDescriptor)
+            {
+                return endpointInfo.ControllerType.IsAssignableFrom(controllerActionDescriptor.ControllerTypeInfo);
+            }
+
+            return false;
+        }
+
         // CreateEndpoints processes the route pattern, replacing area/controller/action parameters with endpoint values
         // Because of default values it is possible for a route pattern to resolve to multiple endpoints
         private int CreateEndpoints(
@@ -222,7 +243,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             IDictionary<string, IList<IParameterPolicy>> allParameterPolicies,
             bool suppressLinkGeneration,
             bool suppressPathMatching,
-            List<Action<EndpointBuilder>> onApply)
+            List<Action<EndpointModel>> conventions)
         {
             var newPathSegments = routePattern.PathSegments.ToList();
 
@@ -249,7 +270,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                         dataTokens,
                         suppressLinkGeneration,
                         suppressPathMatching,
-                        onApply);
+                        conventions);
                     endpoints.Add(subEndpoint);
                 }
 
@@ -310,7 +331,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 dataTokens,
                 suppressLinkGeneration,
                 suppressPathMatching,
-                onApply);
+                conventions);
             endpoints.Add(endpoint);
 
             return routeOrder;
@@ -445,7 +466,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             RouteValueDictionary dataTokens,
             bool suppressLinkGeneration,
             bool suppressPathMatching,
-            List<Action<EndpointBuilder>> onApply)
+            List<Action<EndpointModel>> conventions)
         {
             RequestDelegate requestDelegate = (context) =>
             {
@@ -460,10 +481,10 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             var defaults = new RouteValueDictionary(nonInlineDefaults);
             EnsureRequiredValuesInDefaults(action.RouteValues, defaults);
 
-            var builder = new RouteEndpointBuilder(requestDelegate, RoutePatternFactory.Pattern(patternRawText, defaults, parameterPolicies: null, segments), order);
+            var model = new RouteEndpointModel(requestDelegate, RoutePatternFactory.Pattern(patternRawText, defaults, parameterPolicies: null, segments), order);
 
             AddEndpointMetadata(
-                builder.Metadata,
+                model.Metadata,
                 action,
                 routeName,
                 new RouteValueDictionary(action.RouteValues),
@@ -471,17 +492,17 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 suppressLinkGeneration,
                 suppressPathMatching);
 
-            builder.DisplayName = action.DisplayName;
+            model.DisplayName = action.DisplayName;
 
-            if (onApply != null)
+            if (conventions != null)
             {
-                foreach (var apply in onApply)
+                foreach (var convention in conventions)
                 {
-                    apply(builder);
+                    convention(model);
                 }
             }
 
-            return (RouteEndpoint)builder.Build();
+            return (RouteEndpoint)model.Build();
         }
 
         private static void AddEndpointMetadata(

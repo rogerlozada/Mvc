@@ -28,7 +28,7 @@ namespace MvcSandbox
         {
             app.UseEndpointRouting(endpoints =>
             {
-                endpoints.MapEndpoint(
+                endpoints.MapGet(
                     requestDelegate: WriteEndpoints,
                     pattern: "/endpoints",
                     displayName: "Home");
