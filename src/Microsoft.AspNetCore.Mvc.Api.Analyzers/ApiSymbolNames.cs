@@ -37,6 +37,6 @@ namespace Microsoft.AspNetCore.Mvc.Api.Analyzers
 
         public const string HttpStatusCodes = "Microsoft.AspNetCore.Http.StatusCodes";
 
-        public const string StatusCodeValueAttribute = "Microsoft.AspNetCore.Mvc.Infrastructure.StatusCodeValueAttribute";
+        public const string StatusCodeValueAttribute = "ActionResultStatusCodeValueAttribute";
     }
 }

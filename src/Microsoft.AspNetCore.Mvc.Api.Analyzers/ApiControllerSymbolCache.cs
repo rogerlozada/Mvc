@@ -64,7 +64,5 @@ namespace Microsoft.AspNetCore.Mvc.Api.Analyzers
         public INamedTypeSymbol ProducesDefaultResponseTypeAttribute { get; }
 
         public INamedTypeSymbol ProducesResponseTypeAttribute { get; }
-
-        public INamedTypeSymbol StatusCodeValueAttribute { get; }
     }
 }

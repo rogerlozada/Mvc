@@ -2,6 +2,12 @@
     ViewData["Title"] = "Home Page";
 }
 
+Hello world
+
+@await FlushAsync()
+@{  await Task.Delay(5000);
+}
+
 <div class="row">
     <div class="col-md-3">
         <h2>Sandbox</h2>
