@@ -201,7 +201,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="statusCode">The status code to set on the response.</param>
         /// <returns>The created <see cref="StatusCodeResult"/> object for the response.</returns>
         [NonAction]
-        public virtual StatusCodeResult StatusCode([ActionResultStatusCodeValue] int statusCode)
+        public virtual StatusCodeResult StatusCode([ActionResultStatusCode] int statusCode)
             => new StatusCodeResult(statusCode);
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The value to set on the <see cref="ObjectResult"/>.</param>
         /// <returns>The created <see cref="ObjectResult"/> object for the response.</returns>
         [NonAction]
-        public virtual ObjectResult StatusCode([ActionResultStatusCodeValue] int statusCode, [ObjectResultValue] object value)
+        public virtual ObjectResult StatusCode([ActionResultStatusCode] int statusCode, [ActionResultObjectValueParameterParameter] object value)
         {
             var result = new ObjectResult(value)
             {
@@ -304,7 +304,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The content value to format in the entity body.</param>
         /// <returns>The created <see cref="OkObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual OkObjectResult Ok([ObjectResultValue] object value)
+        public virtual OkObjectResult Ok([ActionResultObjectValue] object value)
             => new OkObjectResult(value);
 
         #region RedirectResult variants
@@ -1716,7 +1716,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <returns>The created <see cref="UnauthorizedObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual UnauthorizedObjectResult Unauthorized([ObjectResultValue] object value)
+        public virtual UnauthorizedObjectResult Unauthorized([ActionResultObjectValue] object value)
             => new UnauthorizedObjectResult(value);
 
         /// <summary>
@@ -1732,7 +1732,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <returns>The created <see cref="NotFoundObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual NotFoundObjectResult NotFound([ObjectResultValue] object value)
+        public virtual NotFoundObjectResult NotFound([ActionResultObjectValue] object value)
             => new NotFoundObjectResult(value);
 
         /// <summary>
@@ -1749,7 +1749,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="error">An error object to be returned to the client.</param>
         /// <returns>The created <see cref="BadRequestObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual BadRequestObjectResult BadRequest([ObjectResultValue] object error)
+        public virtual BadRequestObjectResult BadRequest([ActionResultObjectValue] object error)
             => new BadRequestObjectResult(error);
 
         /// <summary>
@@ -1758,7 +1758,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="modelState">The <see cref="ModelStateDictionary" /> containing errors to be returned to the client.</param>
         /// <returns>The created <see cref="BadRequestObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual BadRequestObjectResult BadRequest([ObjectResultValue] ModelStateDictionary modelState)
+        public virtual BadRequestObjectResult BadRequest([ActionResultObjectValue] ModelStateDictionary modelState)
         {
             if (modelState == null)
             {
@@ -1784,7 +1784,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="error">An error object to be returned to the client.</param>
         /// <returns>The created <see cref="UnprocessableEntityObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual UnprocessableEntityObjectResult UnprocessableEntity([ObjectResultValue] object error)
+        public virtual UnprocessableEntityObjectResult UnprocessableEntity([ActionResultObjectValue] object error)
         {
             return new UnprocessableEntityObjectResult(error);
         }
@@ -1795,7 +1795,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="modelState">The <see cref="ModelStateDictionary" /> containing errors to be returned to the client.</param>
         /// <returns>The created <see cref="UnprocessableEntityObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual UnprocessableEntityObjectResult UnprocessableEntity([ObjectResultValue] ModelStateDictionary modelState)
+        public virtual UnprocessableEntityObjectResult UnprocessableEntity([ActionResultObjectValue] ModelStateDictionary modelState)
         {
             if (modelState == null)
             {
@@ -1819,7 +1819,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="error">Contains errors to be returned to the client.</param>
         /// <returns>The created <see cref="ConflictObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual ConflictObjectResult Conflict([ObjectResultValue] object error)
+        public virtual ConflictObjectResult Conflict([ActionResultObjectValue] object error)
             => new ConflictObjectResult(error);
 
         /// <summary>
@@ -1828,7 +1828,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="modelState">The <see cref="ModelStateDictionary" /> containing errors to be returned to the client.</param>
         /// <returns>The created <see cref="ConflictObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual ConflictObjectResult Conflict([ObjectResultValue] ModelStateDictionary modelState)
+        public virtual ConflictObjectResult Conflict([ActionResultObjectValue] ModelStateDictionary modelState)
             => new ConflictObjectResult(modelState);
 
         /// <summary>
@@ -1836,7 +1836,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <returns>The created <see cref="BadRequestObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual ActionResult ValidationProblem([ObjectResultValue] ValidationProblemDetails descriptor)
+        public virtual ActionResult ValidationProblem([ActionResultObjectValue] ValidationProblemDetails descriptor)
         {
             if (descriptor == null)
             {
@@ -1851,7 +1851,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <returns>The created <see cref="BadRequestObjectResult"/> for the response.</returns>
         [NonAction]
-        public virtual ActionResult ValidationProblem([ObjectResultValue] ModelStateDictionary modelStateDictionary)
+        public virtual ActionResult ValidationProblem([ActionResultObjectValue] ModelStateDictionary modelStateDictionary)
         {
             if (modelStateDictionary == null)
             {
@@ -1881,7 +1881,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The content value to format in the entity body.</param>
         /// <returns>The created <see cref="CreatedResult"/> for the response.</returns>
         [NonAction]
-        public virtual CreatedResult Created(string uri, [ObjectResultValue] object value)
+        public virtual CreatedResult Created(string uri, [ActionResultObjectValue] object value)
         {
             if (uri == null)
             {
@@ -1898,7 +1898,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The content value to format in the entity body.</param>
         /// <returns>The created <see cref="CreatedResult"/> for the response.</returns>
         [NonAction]
-        public virtual CreatedResult Created(Uri uri, [ObjectResultValue] object value)
+        public virtual CreatedResult Created(Uri uri, [ActionResultObjectValue] object value)
         {
             if (uri == null)
             {
@@ -1915,7 +1915,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The content value to format in the entity body.</param>
         /// <returns>The created <see cref="CreatedAtActionResult"/> for the response.</returns>
         [NonAction]
-        public virtual CreatedAtActionResult CreatedAtAction(string actionName, [ObjectResultValue] object value)
+        public virtual CreatedAtActionResult CreatedAtAction(string actionName, [ActionResultObjectValue] object value)
             => CreatedAtAction(actionName, routeValues: null, value: value);
 
         /// <summary>
@@ -1926,7 +1926,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The content value to format in the entity body.</param>
         /// <returns>The created <see cref="CreatedAtActionResult"/> for the response.</returns>
         [NonAction]
-        public virtual CreatedAtActionResult CreatedAtAction(string actionName, object routeValues, [ObjectResultValue] object value)
+        public virtual CreatedAtActionResult CreatedAtAction(string actionName, object routeValues, [ActionResultObjectValue] object value)
             => CreatedAtAction(actionName, controllerName: null, routeValues: routeValues, value: value);
 
         /// <summary>
@@ -1942,7 +1942,7 @@ namespace Microsoft.AspNetCore.Mvc
             string actionName,
             string controllerName,
             object routeValues,
-            [ObjectResultValue] object value)
+            [ActionResultObjectValue] object value)
             => new CreatedAtActionResult(actionName, controllerName, routeValues, value);
 
         /// <summary>
@@ -1952,7 +1952,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The content value to format in the entity body.</param>
         /// <returns>The created <see cref="CreatedAtRouteResult"/> for the response.</returns>
         [NonAction]
-        public virtual CreatedAtRouteResult CreatedAtRoute(string routeName, [ObjectResultValue] object value)
+        public virtual CreatedAtRouteResult CreatedAtRoute(string routeName, [ActionResultObjectValue] object value)
             => CreatedAtRoute(routeName, routeValues: null, value: value);
 
         /// <summary>
@@ -1962,7 +1962,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The content value to format in the entity body.</param>
         /// <returns>The created <see cref="CreatedAtRouteResult"/> for the response.</returns>
         [NonAction]
-        public virtual CreatedAtRouteResult CreatedAtRoute(object routeValues, [ObjectResultValue] object value)
+        public virtual CreatedAtRouteResult CreatedAtRoute(object routeValues, [ActionResultObjectValue] object value)
             => CreatedAtRoute(routeName: null, routeValues: routeValues, value: value);
 
         /// <summary>
@@ -1973,7 +1973,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The content value to format in the entity body.</param>
         /// <returns>The created <see cref="CreatedAtRouteResult"/> for the response.</returns>
         [NonAction]
-        public virtual CreatedAtRouteResult CreatedAtRoute(string routeName, object routeValues, [ObjectResultValue] object value)
+        public virtual CreatedAtRouteResult CreatedAtRoute(string routeName, object routeValues, [ActionResultObjectValue] object value)
             => new CreatedAtRouteResult(routeName, routeValues, value);
 
         /// <summary>
@@ -1990,7 +1990,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The optional content value to format in the entity body; may be null.</param>
         /// <returns>The created <see cref="AcceptedResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedResult Accepted([ObjectResultValue] object value)
+        public virtual AcceptedResult Accepted([ActionResultObjectValue] object value)
             => new AcceptedResult(location: null, value: value);
 
         /// <summary>
@@ -2027,7 +2027,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The optional content value to format in the entity body; may be null.</param>
         /// <returns>The created <see cref="AcceptedResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedResult Accepted(string uri, [ObjectResultValue] object value)
+        public virtual AcceptedResult Accepted(string uri, [ActionResultObjectValue] object value)
             => new AcceptedResult(uri, value);
 
         /// <summary>
@@ -2037,7 +2037,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The optional content value to format in the entity body; may be null.</param>
         /// <returns>The created <see cref="AcceptedResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedResult Accepted(Uri uri, [ObjectResultValue] object value)
+        public virtual AcceptedResult Accepted(Uri uri, [ActionResultObjectValue] object value)
         {
             if (uri == null)
             {
@@ -2073,7 +2073,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The optional content value to format in the entity body; may be null.</param>
         /// <returns>The created <see cref="AcceptedAtActionResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, [ObjectResultValue] object value)
+        public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, [ActionResultObjectValue] object value)
             => AcceptedAtAction(actionName, routeValues: null, value: value);
 
         /// <summary>
@@ -2084,7 +2084,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="routeValues">The route data to use for generating the URL.</param>
         /// <returns>The created <see cref="AcceptedAtActionResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, string controllerName, [ObjectResultValue] object routeValues)
+        public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, string controllerName, [ActionResultObjectValue] object routeValues)
             => AcceptedAtAction(actionName, controllerName, routeValues, value: null);
 
         /// <summary>
@@ -2095,7 +2095,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The optional content value to format in the entity body; may be null.</param>
         /// <returns>The created <see cref="AcceptedAtActionResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, object routeValues, [ObjectResultValue] object value)
+        public virtual AcceptedAtActionResult AcceptedAtAction(string actionName, object routeValues, [ActionResultObjectValue] object value)
             => AcceptedAtAction(actionName, controllerName: null, routeValues: routeValues, value: value);
 
         /// <summary>
@@ -2111,7 +2111,7 @@ namespace Microsoft.AspNetCore.Mvc
             string actionName,
             string controllerName,
             object routeValues,
-            [ObjectResultValue] object value)
+            [ActionResultObjectValue] object value)
             => new AcceptedAtActionResult(actionName, controllerName, routeValues, value);
 
         /// <summary>
@@ -2120,7 +2120,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="routeValues">The route data to use for generating the URL.</param>
         /// <returns>The created <see cref="AcceptedAtRouteResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedAtRouteResult AcceptedAtRoute([ObjectResultValue] object routeValues)
+        public virtual AcceptedAtRouteResult AcceptedAtRoute([ActionResultObjectValue] object routeValues)
             => AcceptedAtRoute(routeName: null, routeValues: routeValues, value: null);
 
         /// <summary>
@@ -2149,7 +2149,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The optional content value to format in the entity body; may be null.</param>
         /// <returns>The created <see cref="AcceptedAtRouteResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedAtRouteResult AcceptedAtRoute(object routeValues, [ObjectResultValue] object value)
+        public virtual AcceptedAtRouteResult AcceptedAtRoute(object routeValues, [ActionResultObjectValue] object value)
             => AcceptedAtRoute(routeName: null, routeValues: routeValues, value: value);
 
         /// <summary>
@@ -2160,7 +2160,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The optional content value to format in the entity body; may be null.</param>
         /// <returns>The created <see cref="AcceptedAtRouteResult"/> for the response.</returns>
         [NonAction]
-        public virtual AcceptedAtRouteResult AcceptedAtRoute(string routeName, object routeValues, [ObjectResultValue] object value)
+        public virtual AcceptedAtRouteResult AcceptedAtRoute(string routeName, object routeValues, [ActionResultObjectValue] object value)
             => new AcceptedAtRouteResult(routeName, routeValues, value);
 
         /// <summary>
