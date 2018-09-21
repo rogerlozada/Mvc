@@ -25,8 +25,6 @@ namespace Microsoft.AspNetCore.Mvc.Api.Analyzers
             ProducesDefaultResponseTypeAttribute = compilation.GetTypeByMetadataName(ApiSymbolNames.ProducesDefaultResponseTypeAttribute);
             ProducesResponseTypeAttribute = compilation.GetTypeByMetadataName(ApiSymbolNames.ProducesResponseTypeAttribute);
 
-            StatusCodeValueAttribute = compilation.GetTypeByMetadataName(ApiSymbolNames.StatusCodeValueAttribute);
-
             var statusCodeActionResult = compilation.GetTypeByMetadataName(ApiSymbolNames.IStatusCodeActionResult);
             StatusCodeActionResultStatusProperty = (IPropertySymbol)statusCodeActionResult?.GetMembers("StatusCode")[0];
 

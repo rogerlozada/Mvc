@@ -211,7 +211,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="value">The value to set on the <see cref="ObjectResult"/>.</param>
         /// <returns>The created <see cref="ObjectResult"/> object for the response.</returns>
         [NonAction]
-        public virtual ObjectResult StatusCode([ActionResultStatusCode] int statusCode, [ActionResultObjectValueParameterParameter] object value)
+        public virtual ObjectResult StatusCode([ActionResultStatusCode] int statusCode, [ActionResultObjectValue] object value)
         {
             var result = new ObjectResult(value)
             {

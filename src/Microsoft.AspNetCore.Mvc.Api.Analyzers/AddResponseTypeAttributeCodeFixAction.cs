@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.Mvc.Api.Analyzers
 
         private ICollection<int> CalculateStatusCodesToApply(CodeActionContext context, IList<DeclaredApiResponseMetadata> declaredResponseMetadata)
         {
-            if (!SymbolApiResponseMetadataProvider.TryGetActualResponseMetadata(context.SymbolCache, context.SemanticModel, context.MethodSyntax, context.CancellationToken, out var actualResponseMetadata))
+            if (!ActualApiResponseMetadataFactory.TryGetActualResponseMetadata(context.SymbolCache, context.SemanticModel, context.MethodSyntax, context.CancellationToken, out var actualResponseMetadata))
             {
                 // If we cannot parse metadata correctly, don't offer fixes.
                 return Array.Empty<int>();
